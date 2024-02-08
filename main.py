@@ -1,5 +1,5 @@
 import subprocess
-from telegram import Update
+from telegram.update import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
 # Telegram bot token
