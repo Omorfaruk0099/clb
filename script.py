@@ -2,7 +2,7 @@ import time
 
 def keep_alive():
     while True:
-        print("Repl.it is still alive!")
-        time.sleep(0.5*60)
+        print("I AM WORKING DON'T WORRY!")
+        time.sleep(0.3*60)
 
 keep_alive()
